@@ -5,7 +5,9 @@ from flask_cors import CORS
 from lamdaCalls import getCredit, verifySite, verifyEmail
 from mysql import connector
 import json
+
 app = Flask(__name__)
+CORS(app)
 
 def validate_body(expected, actual):
     for param in expected:
@@ -13,7 +15,29 @@ def validate_body(expected, actual):
             return False
     return True
 
-CORS(app)
+def insertCredit(values):
+    credib = connector.connect(
+        host="credibit.crcsqwhwrqwu.us-east-2.rds.amazonaws.com",
+        user="credi",
+        passwd="bit12345",
+        database="credidev"
+    )
+
+    cursor = credib.cursor(dictionary=True)
+
+    sql = "INSERT INTO creditRequest (nombreEmpresa, correo, puntosBuro, puntosSat,\
+            ingresoMensual, ingresoNeto, cantidadDeseada, plazoDeseado, companySite,\
+            toPay, approved) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+    vals = (values['nombreEmpresa'], values['correo'],
+            values['puntosBuro'], values['puntosSat'], values['ingresoMensual'],
+            values['ingresoNeto'], values['cantidadDeseada'], values['plazoDeseado'],
+            values['companySite'], values['toPay'], values['approved'])
+
+    cursor.execute(sql, vals)
+
+    credib.commit()
+
+    cursor.close()
 
 @app.route("/")
 def hello():
@@ -46,6 +70,23 @@ def getCreditEligibility():
         }
     else:
         response = getCredit(credit_input)
+
+    insert_credit = {
+        'nombreEmpresa': body['nombreEmpresa'],
+        'correo': body['correo'],
+        'puntosBuro': body['puntosBuro'],
+        'puntosSat': body['puntosSat'],
+        'ingresoMensual': body['ingresoMensual'],
+        'ingresoNeto': body['ingresoNeto'],
+        'cantidadDeseada': body['cantidadDeseada'],
+        'plazoDeseado': body['plazoDeseado'],
+        'companySite': body['companySite'],
+        'approved': response['is_valid']
+    }
+
+    insert_credit['toPay'] = response['ammount'] if response['is_valid'] else None
+
+    insertCredit(insert_credit)
 
     return Response(json.dumps(response), content_type='application/json; charset=utf-8')
 
