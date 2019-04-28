@@ -62,5 +62,35 @@ def companies():
         for field in companies_fields:
             tmp_company[field] = company[field]
         companies_result.append(tmp_company)
+    
+    cursor.close()
 
     return Response(json.dumps({"companies": companies_result}), content_type='application/json; charset=utf-8')
+
+@app.route("/login", methods=['POST'])
+def login():
+    body = request.json
+
+    username = body['username']
+    password = body['password']
+
+    credib = connector.connect(
+        host="credibit.crcsqwhwrqwu.us-east-2.rds.amazonaws.com",
+        user="credi",
+        passwd="bit12345",
+        database="credidev"
+    )
+
+    cursor = credib.cursor(dictionary=True)
+
+    sql = "SELECT * FROM admin WHERE username='%s' and password='%s'" % (username, password)
+    cursor.execute(sql)
+
+    user = cursor.fetchone()
+
+    cursor.close()
+
+    if user is None:
+        return Response("Not able to log in", status=401)
+    else:
+        return "Successful"
