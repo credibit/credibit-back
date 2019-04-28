@@ -1,8 +1,11 @@
 from flask import Flask
 from flask import Response
+from flask_cors import CORS
 from mysql import connector
 import json
 app = Flask(__name__)
+
+CORS(app)
 
 @app.route("/")
 def hello():
