@@ -37,9 +37,7 @@ def getCreditEligibility():
 
     response = getCredit(credit_input)
 
-    print(response)
-
-    return "Hey boi"
+    return Response(json.dumps(response), content_type='application/json; charset=utf-8')
 
 @app.route("/companies")
 def companies():
