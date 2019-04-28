@@ -90,8 +90,8 @@ def getCreditEligibility():
 
     return Response(json.dumps(response), content_type='application/json; charset=utf-8')
 
-@app.route("/companies")
-def companies():
+@app.route("/creditRequests")
+def creditRequests():
     credib = connector.connect(
         host="credibit.crcsqwhwrqwu.us-east-2.rds.amazonaws.com",
         user="credi",
@@ -101,22 +101,13 @@ def companies():
 
     cursor = credib.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM company")
+    cursor.execute("SELECT * FROM creditRequest")
 
-    companies_result = []
-    companies_fields = ["name", "twitter", "linkedin", "facebook", "website", "founded", "employees"]
+    creditRequests = cursor.fetchall()
 
-    companies = cursor.fetchall()
-
-    for company in companies:
-        tmp_company = {}
-        for field in companies_fields:
-            tmp_company[field] = company[field]
-        companies_result.append(tmp_company)
-    
     cursor.close()
 
-    return Response(json.dumps({"companies": companies_result}), content_type='application/json; charset=utf-8')
+    return Response(json.dumps({"creditRequests": creditRequests}), content_type='application/json; charset=utf-8')
 
 @app.route("/login", methods=['POST'])
 def login():
