@@ -2,7 +2,7 @@ from flask import Flask
 from flask import Response
 from flask import request
 from flask_cors import CORS
-from lamdaCalls import getCredit, verifySite
+from lamdaCalls import getCredit, verifySite, verifyEmail
 from mysql import connector
 import json
 app = Flask(__name__)
@@ -35,10 +35,17 @@ def getCreditEligibility():
         'plazoDeseado': body['plazoDeseado']
     }
 
-    valid = verifySite(body['companySite'], body['nombreEmpresa'])
-    print(valid)
+    validSite = verifySite(body['companySite'], body['nombreEmpresa'])
+    validMail = verifyEmail(body['correo'])
 
-    response = getCredit(credit_input)
+    response = ''
+
+    if not validSite or not validMail:
+        response = {
+            'is_valid': False
+        }
+    else:
+        response = getCredit(credit_input)
 
     return Response(json.dumps(response), content_type='application/json; charset=utf-8')
 
