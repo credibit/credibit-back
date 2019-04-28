@@ -48,3 +48,10 @@ def verifyEmail(email):
     lambda_api = 'https://tlnlicdqk0.execute-api.us-east-2.amazonaws.com/prod/validateMail'
     r = requests.post(lambda_api, data=json.dumps({ 'mail': email }))
     return r.status_code == 200
+
+def getFullContact(domain):
+    lambda_api = 'https://tlnlicdqk0.execute-api.us-east-2.amazonaws.com/prod/getFullContact'
+    r = requests.post(lambda_api, data=json.dumps({ 'domain': domain }))
+    response = r.json()
+    company_data = response['response']
+    return company_data

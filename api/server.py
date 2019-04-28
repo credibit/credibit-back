@@ -2,7 +2,7 @@ from flask import Flask
 from flask import Response
 from flask import request
 from flask_cors import CORS
-from lamdaCalls import getCredit, verifySite, verifyEmail
+from lamdaCalls import getCredit, verifySite, verifyEmail, getFullContact
 from mysql import connector
 import json
 
@@ -27,11 +27,13 @@ def insertCredit(values):
 
     sql = "INSERT INTO creditRequest (nombreEmpresa, correo, puntosBuro, puntosSat,\
             ingresoMensual, ingresoNeto, cantidadDeseada, plazoDeseado, companySite,\
-            toPay, approved) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+            toPay, approved, twitter, linkedin, facebook, founded, employees) VALUES\
+            (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
     vals = (values['nombreEmpresa'], values['correo'],
             values['puntosBuro'], values['puntosSat'], values['ingresoMensual'],
             values['ingresoNeto'], values['cantidadDeseada'], values['plazoDeseado'],
-            values['companySite'], values['toPay'], values['approved'])
+            values['companySite'], values['toPay'], values['approved'], values['twitter'],
+            values['linkedin'], values['facebook'], values['founded'], values['employees'])
 
     cursor.execute(sql, vals)
 
@@ -70,6 +72,8 @@ def getCreditEligibility():
         }
     else:
         response = getCredit(credit_input)
+    
+    comp_data = getFullContact(body['companySite'])
 
     insert_credit = {
         'nombreEmpresa': body['nombreEmpresa'],
@@ -81,7 +85,12 @@ def getCreditEligibility():
         'cantidadDeseada': body['cantidadDeseada'],
         'plazoDeseado': body['plazoDeseado'],
         'companySite': body['companySite'],
-        'approved': response['is_valid']
+        'approved': response['is_valid'],
+        'twitter': comp_data['twitter'],
+        'facebook': comp_data['facebook'],
+        'linkedin': comp_data['linkedin'],
+        'founded': comp_data['founded'],
+        'employees': comp_data['employees']
     }
 
     insert_credit['toPay'] = response['ammount'] if response['is_valid'] else None
