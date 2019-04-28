@@ -2,7 +2,7 @@ from flask import Flask
 from flask import Response
 from flask import request
 from flask_cors import CORS
-from lamdaCalls import getCredit
+from lamdaCalls import getCredit, verifySite
 from mysql import connector
 import json
 app = Flask(__name__)
@@ -21,7 +21,7 @@ def hello():
 
 @app.route("/creditEligibility", methods=['POST'])
 def getCreditEligibility():
-    expected_values = ['nombreEmpresa', 'correo', 'puntosBuro', 'puntosSat', 'cantidadDeseada', 'plazoDeseado', 'ingresoMensual', 'ingresoNeto']
+    expected_values = ['nombreEmpresa', 'correo', 'puntosBuro', 'puntosSat', 'cantidadDeseada', 'plazoDeseado', 'ingresoMensual', 'ingresoNeto', 'companySite']
     body = request.json
 
     valid = validate_body(expected_values, body)
@@ -34,6 +34,9 @@ def getCreditEligibility():
         'cantidadDeseada': body['cantidadDeseada'],
         'plazoDeseado': body['plazoDeseado']
     }
+
+    valid = verifySite(body['companySite'], body['nombreEmpresa'])
+    print(valid)
 
     response = getCredit(credit_input)
 

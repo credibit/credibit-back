@@ -32,3 +32,9 @@ def getCredit(params):
     result['ammount'] = response[1]
 
     return result
+
+def verifySite(url, company):
+    lambda_api = 'https://tlnlicdqk0.execute-api.us-east-2.amazonaws.com/prod/checkSiteAvailability'
+    r = requests.post(lambda_api, data=json.dumps({ 'url': url, 'company': company }))
+
+    return r.status_code == 200
