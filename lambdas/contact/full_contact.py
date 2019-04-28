@@ -1,7 +1,12 @@
 import requests
 import json
 
-def getFullContact(domain):
+def full_contact(event, context):
+    file = event['body']
+    dic = json.loads(file)
+
+    domain = dic['domain']
+    
     headers = {
         "X-RapidAPI-Host": "fullcontact-enrich-v1.p.rapidapi.com",
         "X-RapidAPI-Key": "f14cd51d87msh19885c10365d9f2p109e41jsn49e62da44290",
@@ -25,4 +30,8 @@ def getFullContact(domain):
     return_data['founded'] = company_data['founded']
     return_data['employees'] = company_data['employees']
 
-    return return_data
+    return {
+        'statusCode': 200,
+        'headers': { 'Content-Type': 'application/json' },
+        'body': json.dumps({"response": return_data})
+    }
