@@ -9,6 +9,11 @@ import json
 app = Flask(__name__)
 CORS(app)
 
+db_host = "generalpurpose.crcsqwhwrqwu.us-east-2.rds.amazonaws.com"
+db_user = "admin"
+db_passwd = "arquitecturasoftware"
+db = "credidev"
+
 def validate_body(expected, actual):
     for param in expected:
         if param not in actual:
@@ -17,10 +22,10 @@ def validate_body(expected, actual):
 
 def insertCredit(values):
     credib = connector.connect(
-        host="credibit.crcsqwhwrqwu.us-east-2.rds.amazonaws.com",
-        user="credi",
-        passwd="bit12345",
-        database="credidev"
+        host=db_host,
+        user=db_user,
+        passwd=db_passwd,
+        database=db
     )
 
     cursor = credib.cursor(dictionary=True)
@@ -102,10 +107,10 @@ def getCreditEligibility():
 @app.route("/creditRequests")
 def creditRequests():
     credib = connector.connect(
-        host="credibit.crcsqwhwrqwu.us-east-2.rds.amazonaws.com",
-        user="credi",
-        passwd="bit12345",
-        database="credidev"
+        host=db_host,
+        user=db_user,
+        passwd=db_passwd,
+        database=db
     )
 
     cursor = credib.cursor(dictionary=True)
@@ -126,10 +131,10 @@ def login():
     password = body['password']
 
     credib = connector.connect(
-        host="credibit.crcsqwhwrqwu.us-east-2.rds.amazonaws.com",
-        user="credi",
-        passwd="bit12345",
-        database="credidev"
+        host=db_host,
+        user=db_user,
+        passwd=db_passwd,
+        database=db
     )
 
     cursor = credib.cursor(dictionary=True)
